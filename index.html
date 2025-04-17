@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <title>Workout Rest Timer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180" />
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
@@ -36,6 +39,13 @@
             font-size: 3em;
             margin-top: 1.5em;
             color: #00e676;
+            transition: background-color 0.3s ease;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .alert {
+            background-color: #ff5252;
+            color: white;
         }
     </style>
 </head>
@@ -52,17 +62,13 @@
     </div>
     <div id="timer">00:00</div>
 
-    <audio id="beep" preload="auto">
-        <source src="https://www.soundjay.com/button/beep-07.mp3" type="audio/mpeg" />
-    </audio>
-
     <script>
         const timerDisplay = document.getElementById('timer');
-        const beepSound = document.getElementById('beep');
         let countdown;
 
         function startTimer(seconds) {
-            clearInterval(countdown); // reset any running timers
+            clearInterval(countdown);
+            timerDisplay.classList.remove('alert');
             const endTime = Date.now() + seconds * 1000;
 
             function updateTimer() {
@@ -70,18 +76,15 @@
                 const remaining = Math.max(0, endTime - now);
                 const minutes = Math.floor(remaining / 1000 / 60);
                 const secs = Math.floor((remaining / 1000) % 60);
-                timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                timerDisplay.textContent = \`\${String(minutes).padStart(2, '0')}:\${String(secs).padStart(2, '0')}\`;
 
                 if (remaining <= 0) {
                     clearInterval(countdown);
-                    beepSound.play();
-                    if (navigator.vibrate) {
-                        navigator.vibrate([300, 100, 300]);
-                    }
+                    timerDisplay.classList.add('alert');
                 }
             }
 
-            updateTimer(); // fire immediately
+            updateTimer();
             countdown = setInterval(updateTimer, 1000);
         }
     </script>
