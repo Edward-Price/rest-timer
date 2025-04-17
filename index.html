@@ -8,6 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
@@ -182,110 +183,177 @@
     </div>
   </div>
 
-  <script>
+  
+<script>
     function switchTab(tabId) {
-      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelector(`.tab-button[onclick*="${tabId}"]`).classList.add('active');
-      document.getElementById(tabId).classList.add('active');
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelector(`.tab-button[onclick*="${tabId}"]`).classList.add('active');
+        document.getElementById(tabId).classList.add('active');
     }
 
     let countdown, wakeLock = null, totalTime = 0;
     async function requestWakeLock() {
-      try {
-        if ('wakeLock' in navigator) {
-          wakeLock = await navigator.wakeLock.request('screen');
-        }
-      } catch (err) {}
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+            }
+        } catch (err) {}
     }
 
     function startTimer(seconds) {
-      clearInterval(countdown);
-      requestWakeLock();
-      totalTime = seconds;
-      const timerDisplay = document.getElementById('timer');
-      const endTime = Date.now() + seconds * 1000;
-      function updateTimer() {
-        const now = Date.now();
-        const remaining = Math.max(0, endTime - now);
-        const minutes = Math.floor(remaining / 1000 / 60);
-        const secs = Math.floor((remaining / 1000) % 60);
-        timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-        const percentLeft = remaining / (totalTime * 1000);
-        timerDisplay.classList.remove("red", "yellow");
-        if (percentLeft <= 0.10) timerDisplay.classList.add("red");
-        else if (percentLeft <= 0.6) timerDisplay.classList.add("yellow");
-        if (remaining <= 0) {
-          clearInterval(countdown);
-          if (wakeLock) wakeLock.release().then(() => wakeLock = null);
+        clearInterval(countdown);
+        requestWakeLock();
+        totalTime = seconds;
+        const timerDisplay = document.getElementById('timer');
+        const endTime = Date.now() + seconds * 1000;
+
+        function updateTimer() {
+            const now = Date.now();
+            const remaining = Math.max(0, endTime - now);
+            const minutes = Math.floor(remaining / 1000 / 60);
+            const secs = Math.floor((remaining / 1000) % 60);
+            timerDisplay.textContent = minutes.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
+            const percentLeft = remaining / (totalTime * 1000);
+            timerDisplay.classList.remove("red", "yellow");
+            if (percentLeft <= 0.10) timerDisplay.classList.add("red");
+            else if (percentLeft <= 0.6) timerDisplay.classList.add("yellow");
+
+            if (remaining <= 0) {
+                clearInterval(countdown);
+                if (wakeLock) wakeLock.release().then(() => wakeLock = null);
+            }
         }
-      }
-      updateTimer();
-      countdown = setInterval(updateTimer, 1000);
+
+        updateTimer();
+        countdown = setInterval(updateTimer, 1000);
     }
 
     function resetTimer() {
-      clearInterval(countdown);
-      const timerDisplay = document.getElementById('timer');
-      timerDisplay.textContent = "00:00";
-      timerDisplay.classList.remove("red", "yellow");
-      if (wakeLock) wakeLock.release().then(() => wakeLock = null);
+        clearInterval(countdown);
+        const timerDisplay = document.getElementById('timer');
+        timerDisplay.textContent = "00:00";
+        timerDisplay.classList.remove("red", "yellow");
+        if (wakeLock) wakeLock.release().then(() => wakeLock = null);
     }
 
     function savePlan(type) {
-      const input = document.getElementById(`${type}Input`).value;
-      localStorage.setItem(`${type}Plan`, input);
-      document.getElementById(`${type}Output`).textContent = input;
+        const input = document.getElementById(type + "Input").value;
+        localStorage.setItem(type + "Plan", input);
+        document.getElementById(type + "Output").textContent = input;
     }
 
     ["workout", "meal", "shop"].forEach(type => {
-      const saved = localStorage.getItem(`${type}Plan`);
-      if (saved) {
-        document.getElementById(`${type}Output`).textContent = saved;
-      }
+        const saved = localStorage.getItem(type + "Plan");
+        if (saved) {
+            document.getElementById(type + "Output").textContent = saved;
+        }
     });
 
     const checkboxes = document.querySelectorAll('.check');
     const successMessage = document.getElementById('successMessage');
     const streakCounter = document.getElementById('streakCounter');
     let streak = parseInt(localStorage.getItem("weeklyStreak")) || 0;
-    streakCounter.textContent = `🏆 Weekly Streak: ${streak}`;
+    streakCounter.textContent = "🏆 Weekly Streak: " + streak;
 
     function updateProgress() {
-      let allChecked = true;
-      checkboxes.forEach(box => {
-        localStorage.setItem(box.dataset.key, box.checked);
-        if (!box.checked) allChecked = false;
-      });
-      successMessage.style.display = allChecked ? "block" : "none";
+        let allChecked = true;
+        checkboxes.forEach(box => {
+            localStorage.setItem(box.dataset.key, box.checked);
+            if (!box.checked) allChecked = false;
+        });
+        successMessage.style.display = allChecked ? "block" : "none";
     }
 
     function completeWeek() {
-      let allDone = true;
-      checkboxes.forEach(box => {
-        if (!box.checked) allDone = false;
-      });
-      if (allDone) {
-        streak += 1;
-      } else {
-        streak = 0;
-      }
-      localStorage.setItem("weeklyStreak", streak);
-      streakCounter.textContent = `🏆 Weekly Streak: ${streak}`;
-      checkboxes.forEach(box => {
-        box.checked = false;
-        localStorage.setItem(box.dataset.key, false);
-      });
-      successMessage.style.display = "none";
+        let allDone = true;
+        checkboxes.forEach(box => {
+            if (!box.checked) allDone = false;
+        });
+
+        if (allDone) {
+            streak += 1;
+            fireConfetti();
+        } else {
+            streak = 0;
+        }
+
+        localStorage.setItem("weeklyStreak", streak);
+        localStorage.setItem("lastReset", new Date().toDateString());
+        streakCounter.textContent = "🏆 Weekly Streak: " + streak;
+
+        checkboxes.forEach(box => {
+            box.checked = false;
+            localStorage.setItem(box.dataset.key, false);
+        });
+
+        successMessage.style.display = "none";
     }
 
+    function fireConfetti() {
+        const duration = 1000;
+        const interval = 200;
+        const end = Date.now() + duration;
+        const confettiInterval = setInterval(() => {
+            if (Date.now() > end) {
+                clearInterval(confettiInterval);
+                return;
+            }
+            confetti({
+                particleCount: 7,
+                angle: 60,
+                spread: 70,
+                origin: { x: 0 }
+            });
+            confetti({
+                particleCount: 7,
+                angle: 120,
+                spread: 70,
+                origin: { x: 1 }
+            });
+        }, interval);
+    }
+
+    // Auto reset on Monday
+    window.addEventListener("load", () => {
+        const lastReset = localStorage.getItem("lastReset");
+        const today = new Date();
+        const day = today.getDay(); // 1 = Monday
+        const dateStr = today.toDateString();
+
+        if (day === 1 && lastReset !== dateStr) {
+            let allDone = true;
+            checkboxes.forEach(box => {
+                if (!box.checked) allDone = false;
+            });
+
+            if (allDone) {
+                streak += 1;
+            } else {
+                streak = 0;
+            }
+
+            localStorage.setItem("weeklyStreak", streak);
+            streakCounter.textContent = "🏆 Weekly Streak: " + streak;
+
+            checkboxes.forEach(box => {
+                box.checked = false;
+                localStorage.setItem(box.dataset.key, false);
+            });
+
+            localStorage.setItem("lastReset", dateStr);
+            successMessage.style.display = "none";
+        }
+    });
+
     checkboxes.forEach(box => {
-      const saved = localStorage.getItem(box.dataset.key);
-      if (saved === "true") box.checked = true;
-      box.addEventListener('change', updateProgress);
+        const saved = localStorage.getItem(box.dataset.key);
+        if (saved === "true") box.checked = true;
+        box.addEventListener('change', updateProgress);
     });
 
     updateProgress();
-  </script>
+</script>
+
 </body>
 </html>
