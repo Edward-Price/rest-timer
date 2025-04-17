@@ -76,7 +76,7 @@
                 const remaining = Math.max(0, endTime - now);
                 const minutes = Math.floor(remaining / 1000 / 60);
                 const secs = Math.floor((remaining / 1000) % 60);
-                timerDisplay.textContent = \`\${String(minutes).padStart(2, '0')}:\${String(secs).padStart(2, '0')}\`;
+                timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
                 if (remaining <= 0) {
                     clearInterval(countdown);
