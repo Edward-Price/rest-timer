@@ -141,15 +141,18 @@
     <button class="tab-button" onclick="switchTab('tracker-tab')">Tracker</button>
   </nav>
 
-  <div class="tab-content active" id="timer-tab">
-    <button class="btn" onclick="startTimer(30)">30s (Superset / Drop Set)</button>
-    <button class="btn" onclick="startTimer(45)">45s (Isolation Set Recovery)</button>
-    <button class="btn" onclick="startTimer(60)">60s (Standard Set Rest)</button>
-    <button class="btn" onclick="startTimer(90)">90s (Heavy Set Recovery)</button>
-    <button class="btn" onclick="startTimer(120)">2 min (Compound Lift Rest)</button>
-    <button class="btn" onclick="startTimer(180)">3 min (Rest Between Exercises)</button>
-    <button class="btn" onclick="resetTimer()">Reset Timer</button>
-    <div id="timer">00:00</div>
+  
+    <div class="tab-content active" id="timer-tab">
+      <div id="timer" style="margin-bottom: 1em;">00:00</div>
+      <div class="btn-container" style="display: flex; flex-direction: column; gap: 0.8em;">
+        <button class="btn" style="background-color: #f06292;" onclick="startTimer(30)">30s (Superset / Drop Set)</button>
+        <button class="btn" style="background-color: #ba68c8;" onclick="startTimer(45)">45s (Isolation Set Recovery)</button>
+        <button class="btn" style="background-color: #4db6ac;" onclick="startTimer(60)">60s (Standard Set Rest)</button>
+        <button class="btn" style="background-color: #7986cb;" onclick="startTimer(90)">90s (Heavy Set Recovery)</button>
+        <button class="btn" style="background-color: #ffb74d;" onclick="startTimer(120)">2 min (Compound Lift Rest)</button>
+        <button class="btn" style="background-color: #64b5f6;" onclick="startTimer(180)">3 min (Rest Between Exercises)</button>
+        <button class="btn" style="background-color: #ef5350;" onclick="resetTimer()">Reset Timer</button>
+      </div>
   </div>
 
   <div class="tab-content" id="workout-tab">
@@ -177,8 +180,12 @@
       <div class="workout"><label><input type="checkbox" class="check" data-key="workout2"> Pull Day</label></div>
       <div class="workout"><label><input type="checkbox" class="check" data-key="workout3"> Leg Day</label></div>
       <div class="workout"><label><input type="checkbox" class="check" data-key="workout4"> Upper Body Mix</label></div>
-      <div id="successMessage" class="success">✅ You hit all 4 workouts this week. Keep it up!</div>
-      <div id="streakCounter" class="streak">🏆 Weekly Streak: 0</div>
+            <div id="streakCounter" class="streak">🏆 Weekly Streak: 0</div>
+<div class="badge-display" id="badgeDisplay" style="text-align:center; margin: 1em 0; font-weight: bold; font-size: 1.1em;"></div>
+<div class="progress-bar-wrapper" style="background:#e0e0e0; border-radius:20px; height:20px; width:100%; overflow:hidden; margin:10px auto;">
+    <div id="progressBar" style="height:100%; width:0%; background:#42a5f5;"></div>
+</div>
+
       <button class="btn" onclick="completeWeek()">Complete Week</button>
     </div>
   </div>
@@ -251,10 +258,10 @@
     });
 
     const checkboxes = document.querySelectorAll('.check');
-    const successMessage = document.getElementById('successMessage');
-    const streakCounter = document.getElementById('streakCounter');
+        const streakCounter = document.getElementById('streakCounter');
     let streak = parseInt(localStorage.getItem("weeklyStreak")) || 0;
     streakCounter.textContent = "🏆 Weekly Streak: " + streak;
+        updateBadgeAndProgress();
 
     function updateProgress() {
         let allChecked = true;
@@ -262,7 +269,7 @@
             localStorage.setItem(box.dataset.key, box.checked);
             if (!box.checked) allChecked = false;
         });
-        successMessage.style.display = allChecked ? "block" : "none";
+        
     }
 
     function completeWeek() {
@@ -281,13 +288,14 @@
         localStorage.setItem("weeklyStreak", streak);
         localStorage.setItem("lastReset", new Date().toDateString());
         streakCounter.textContent = "🏆 Weekly Streak: " + streak;
+        updateBadgeAndProgress();
 
         checkboxes.forEach(box => {
             box.checked = false;
             localStorage.setItem(box.dataset.key, false);
         });
 
-        successMessage.style.display = "none";
+        
     }
 
     function fireConfetti() {
@@ -335,6 +343,7 @@
 
             localStorage.setItem("weeklyStreak", streak);
             streakCounter.textContent = "🏆 Weekly Streak: " + streak;
+        updateBadgeAndProgress();
 
             checkboxes.forEach(box => {
                 box.checked = false;
@@ -342,7 +351,7 @@
             });
 
             localStorage.setItem("lastReset", dateStr);
-            successMessage.style.display = "none";
+            
         }
     });
 
@@ -351,6 +360,24 @@
         if (saved === "true") box.checked = true;
         box.addEventListener('change', updateProgress);
     });
+
+    updateBadgeAndProgress();
+    
+    function updateBadgeAndProgress() {
+        const badgeDisplay = document.getElementById("badgeDisplay");
+        const progressBar = document.getElementById("progressBar");
+        let badge = "";
+        if (streak >= 15) badge = "👑 Legend";
+        else if (streak >= 10) badge = "🧠 Discipline Beast";
+        else if (streak >= 5) badge = "🦾 Consistency King";
+        else if (streak >= 3) badge = "🔥 Getting Serious";
+        else if (streak >= 1) badge = "🟢 Starter";
+        else badge = "";
+
+        badgeDisplay.textContent = badge ? "🏅 " + badge : "";
+        const width = Math.min(streak * 10, 100);
+        progressBar.style.width = width + "%";
+    }
 
     updateProgress();
 </script>
