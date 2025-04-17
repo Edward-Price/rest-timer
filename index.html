@@ -21,11 +21,11 @@
             margin-bottom: 1em;
         }
         .btn {
-            display: inline-block;
-            width: 42%;
-            margin: 1% 2%;
-            padding: 1em;
-            font-size: 1.2em;
+            display: block;
+            width: 90%;
+            margin: 0.7em auto;
+            padding: 1.2em;
+            font-size: 1.1em;
             border: none;
             border-radius: 10px;
             background-color: #1E88E5;
@@ -51,15 +51,14 @@
 </head>
 <body>
     <h1>Rest Timer</h1>
-    <p>Select a rest time below:</p>
-    <div>
-        <button class="btn" onclick="startTimer(30)">30s</button>
-        <button class="btn" onclick="startTimer(45)">45s</button>
-        <button class="btn" onclick="startTimer(60)">60s</button>
-        <button class="btn" onclick="startTimer(90)">90s</button>
-        <button class="btn" onclick="startTimer(120)">2 min</button>
-        <button class="btn" onclick="startTimer(180)">3 min</button>
-    </div>
+
+    <button class="btn" onclick="startTimer(30)">30s (Superset / Drop Set)</button>
+    <button class="btn" onclick="startTimer(45)">45s (Isolation Set Recovery)</button>
+    <button class="btn" onclick="startTimer(60)">60s (Standard Set Rest)</button>
+    <button class="btn" onclick="startTimer(90)">90s (Heavy Set Recovery)</button>
+    <button class="btn" onclick="startTimer(120)">2 min (Compound Lift Rest)</button>
+    <button class="btn" onclick="startTimer(180)">3 min (Rest Between Exercises)</button>
+
     <div id="timer">00:00</div>
 
     <script>
