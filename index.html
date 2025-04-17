@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Workout Rest Timer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
@@ -48,37 +48,40 @@
         <button class="btn" onclick="startTimer(60)">60s</button>
         <button class="btn" onclick="startTimer(90)">90s</button>
         <button class="btn" onclick="startTimer(120)">2 min</button>
-        <button class="btn" onclick="startTimer(180)">3 min (Between Exercises)</button>
+        <button class="btn" onclick="startTimer(180)">3 min</button>
     </div>
     <div id="timer">00:00</div>
 
-    <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+    <audio id="beep" preload="auto">
+        <source src="https://www.soundjay.com/button/beep-07.mp3" type="audio/mpeg" />
+    </audio>
 
     <script>
-        let timerDisplay = document.getElementById('timer');
-        let beepSound = document.getElementById('beep');
+        const timerDisplay = document.getElementById('timer');
+        const beepSound = document.getElementById('beep');
         let countdown;
 
         function startTimer(seconds) {
-            clearInterval(countdown);
-            let endTime = Date.now() + seconds * 1000;
+            clearInterval(countdown); // reset any running timers
+            const endTime = Date.now() + seconds * 1000;
 
             function updateTimer() {
-                let remaining = Math.max(0, endTime - Date.now());
-                let minutes = Math.floor(remaining / 1000 / 60);
-                let secs = Math.floor((remaining / 1000) % 60);
-                timerDisplay.textContent = \`\${String(minutes).padStart(2, '0')}:\${String(secs).padStart(2, '0')}\`;
+                const now = Date.now();
+                const remaining = Math.max(0, endTime - now);
+                const minutes = Math.floor(remaining / 1000 / 60);
+                const secs = Math.floor((remaining / 1000) % 60);
+                timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
                 if (remaining <= 0) {
                     clearInterval(countdown);
                     beepSound.play();
                     if (navigator.vibrate) {
-                        navigator.vibrate([400, 200, 400]);
+                        navigator.vibrate([300, 100, 300]);
                     }
                 }
             }
 
-            updateTimer();
+            updateTimer(); // fire immediately
             countdown = setInterval(updateTimer, 1000);
         }
     </script>
