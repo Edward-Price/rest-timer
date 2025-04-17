@@ -382,5 +382,14 @@
     updateProgress();
 </script>
 
+
+<script>
+    const currentVersion = "1.0.3"; // Increment this to force refresh
+    if (localStorage.getItem("appVersion") !== currentVersion) {
+        localStorage.setItem("appVersion", currentVersion);
+        location.reload(true);
+    }
+</script>
 </body>
+
 </html>
